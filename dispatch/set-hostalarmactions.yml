@@ -1,0 +1,26 @@
+# YAML file for Set-HostAlarmActions function in VMware Dispatch, to disable/enable alarms for hosts.
+# Creates a function and subscriptions to run when a host enters or exits maintenance mode. Requires
+# the secret 'vsphere' and image 'powershell-powercli' as prerequisites.
+#
+# To set this up download the powershell script:
+# curl -ko Set-HostAlarmActions.ps1 'https://raw.githubusercontent.com/doogleit/powercli-misc/master/dispatch/Set-HostAlarmActions.ps1'
+#
+# Then run dispatch create:
+# dispatch create -f 'https://raw.githubusercontent.com/doogleit/powercli-misc/master/dispatch/set-hostalarmactions.yml'
+kind: Function
+name: set-hostalarmactions
+sourcePath: 'Set-HostAlarmActions.ps1'
+image: powershell-powercli
+schema: {}
+secrets:
+  - vsphere
+---
+kind: Subscription
+eventtype: entered.maintenance.mode
+function: set-hostalarmactions
+name: set-hostalarmactions-entermaint
+---
+kind: Subscription
+eventtype: exit.maintenance.mode
+function: set-hostalarmactions
+name: set-hostalarmactions-exitmaint
