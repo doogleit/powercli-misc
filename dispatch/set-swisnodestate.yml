@@ -1,0 +1,34 @@
+# YAML file for Set-SwisNodeState function in VMware Dispatch, to disable/enable alerts for hosts in SolarWinds
+# Creates an image, function, and subscriptions to run when a host enters or exits maintenance mode.
+#
+# To set this up, download the powershell script:
+# curl -ko Set-SwisNodeState.ps1 'https://raw.githubusercontent.com/doogleit/powercli-misc/master/dispatch/Set-SwisNodeState.ps1'
+#
+# Create a secret for the SolarWinds host:
+# dispatch create secret swis /dev/stdin << EOF
+# {
+#   "swishost": "swishost.domain.com",
+#   "swisuser": "<username>",
+#   "swispass": "<password>"
+# }
+# EOF
+# Create the function and subscriptions with this file:
+# dispatch create -f 'https://raw.githubusercontent.com/doogleit/powercli-misc/master/dispatch/set-swisnodestate.yml'
+kind: Function
+name: set-swisnodestate
+sourcePath: 'Set-SwisNodeState.ps1'
+image: powershell-powercli
+schema: {}
+secrets:
+  - vsphere
+  - swis
+---
+kind: Subscription
+eventtype: entered.maintenance.mode
+function: set-swisnodestate
+name: set-swisnodestate-entermaint
+---
+kind: Subscription
+eventtype: exit.maintenance.mode
+function: set-swisnodestate
+name: set-swisnodestate-exitmaint
